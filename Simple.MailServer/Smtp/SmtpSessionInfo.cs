@@ -27,6 +27,9 @@ namespace Simple.MailServer.Smtp
 {
     public class SmtpSessionInfo
     {
+		private static object _lck_sessionIDent = new object();
+		private static long _sessionIDent = 0;
+		
         public bool HasData { get; set; }
         public SmtpIdentification Identification { get; set; }
         public MailAddressWithParameters MailFrom { get; set; }
@@ -34,14 +37,28 @@ namespace Simple.MailServer.Smtp
         public object Tag { get; set; }
 
         public DateTime CreatedTimestamp { get; private set; }
+        public string SessionIDent { get; private set; }
 
         public SmtpSessionInfo()
-        {
-            CreatedTimestamp = DateTime.UtcNow;
+		{
+			CreatedTimestamp = DateTime.Now;
+			SessionIDent = sessionIDent();
 
-            Identification = new SmtpIdentification();
-            Recipients = new List<MailAddressWithParameters>();
-        }
+			Identification = new SmtpIdentification();
+			Recipients = new List<MailAddressWithParameters>();
+		}
+
+		public string sessionIDent()
+		{
+			string ret;
+
+			lock (_lck_sessionIDent) {
+				if (_sessionIDent == long.MaxValue)
+					_sessionIDent = 0;
+				ret = string.Format("{0:X}{1:X}", DateTime.Now.Ticks, ++_sessionIDent);
+			}
+			return ret;
+		}
 
         public void Reset()
         {

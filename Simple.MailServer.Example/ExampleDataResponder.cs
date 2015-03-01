@@ -53,7 +53,8 @@ namespace Simple.MailServer.Example
 
         private string GetFileNameFromSessionInfo(SmtpSessionInfo sessionInfo)
         {
-            var fileName = sessionInfo.CreatedTimestamp.ToString("yyyy-MM-dd_HHmmss_fff") + ".eml";
+//            var fileName = sessionInfo.CreatedTimestamp.ToString("yyyy-MM-dd_HHmmss_fff") + ".eml";
+            var fileName = sessionInfo.SessionIDent + ".eml";
             var fullName = Path.Combine(_mailDir, fileName);
             return fullName;
         }
